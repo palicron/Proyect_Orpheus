@@ -36,13 +36,10 @@ void AProyect_OrpheusPlayerController::SetupInputComponent()
 	InputComponent->BindTouch(EInputEvent::IE_Pressed, this, &AProyect_OrpheusPlayerController::MoveToTouchLocation);
 	InputComponent->BindTouch(EInputEvent::IE_Repeat, this, &AProyect_OrpheusPlayerController::MoveToTouchLocation);
 
-	InputComponent->BindAction("ResetVR", IE_Pressed, this, &AProyect_OrpheusPlayerController::OnResetVR);
+	
 }
 
-void AProyect_OrpheusPlayerController::OnResetVR()
-{
-	UHeadMountedDisplayFunctionLibrary::ResetOrientationAndPosition();
-}
+
 
 void AProyect_OrpheusPlayerController::MoveToMouseCursor()
 {
