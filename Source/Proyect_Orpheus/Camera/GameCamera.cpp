@@ -19,14 +19,18 @@ AGameCamera::AGameCamera()
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(RootComponent);
 	CameraBoom->SetUsingAbsoluteRotation(true); // Don't want arm to rotate when character does
-	CameraBoom->TargetArmLength = 800.f;
-	CameraBoom->SetRelativeRotation(FRotator(-60.f, 0.f, 0.f));
+	CameraBoom->TargetArmLength = 3500.0;
+	CameraBoom->SetRelativeRotation(FRotator(-45.f, -45.0, 0.0 ));
 	CameraBoom->bDoCollisionTest = false; // Don't want to pull camera in when it collides with level
-
+	CameraBoom->TargetOffset = FVector(-1000, 950, 0);
+	
 	// Create a camera...
-	TopDownCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("TopDownCamera"));
+	TopDownCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("GameCamera"));
 	TopDownCameraComponent->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 	TopDownCameraComponent->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
+	TopDownCameraComponent->SetRelativeRotation(  FRotator(10.f,0.f,0.f));
+	TopDownCameraComponent->FieldOfView = 45;
+	TopDownCameraComponent->AspectRatio = 1.778646f;
 
 }
 
@@ -53,4 +57,21 @@ void AGameCamera::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 }
+
+void AGameCamera::SetThisCamera(AActor* newTarget, float blendTime, EViewTargetBlendFunction transiton, float blenExp,
+	bool DestroidThis)
+{
+	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(this, 0);
+	if (PlayerController)
+	{
+		PlayerController->SetViewTargetWithBlend(newTarget, blendTime, transiton, blenExp);
+
+		if(DestroidThis)
+		{
+			this->Destroy();
+		}
+	}
+}
+
+
 

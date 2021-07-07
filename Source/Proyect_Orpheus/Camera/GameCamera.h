@@ -27,7 +27,7 @@ protected:
 	virtual void BeginPlay() override;
 
 	/** Top down camera */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Camera, meta = (AllowPrivateAccess = "true"))
 		class UCameraComponent* TopDownCameraComponent;
 
 	/** Camera boom positioning the camera above the character */
@@ -40,5 +40,8 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	UFUNCTION(BlueprintCallable,Category="CameraUtiles")
+	void SetThisCamera(AActor* newTarget, float blendTime, EViewTargetBlendFunction transiton,float blenExp,bool DestroidThis=false);
 
 };
