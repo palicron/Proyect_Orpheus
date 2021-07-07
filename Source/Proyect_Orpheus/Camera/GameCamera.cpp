@@ -6,7 +6,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Camera/CameraComponent.h"
-
+#include "Kismet/KismetMathLibrary.h"
 // Sets default values
 AGameCamera::AGameCamera()
 {
@@ -51,11 +51,20 @@ void AGameCamera::BeginPlay()
 	
 }
 
+
 // Called every frame
 void AGameCamera::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if(bMoving)
+	{
+		MoveActorCamera(DeltaTime);
+	}
+	if (bRotating)
+	{
+		RotateActorCamera(DeltaTime);
+	}
 }
 
 void AGameCamera::SetThisCamera(AActor* newTarget, float blendTime, EViewTargetBlendFunction transiton, float blenExp,
@@ -64,14 +73,72 @@ void AGameCamera::SetThisCamera(AActor* newTarget, float blendTime, EViewTargetB
 	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(this, 0);
 	if (PlayerController)
 	{
+		//TODO encontrar una forma de controlar la tracicion
 		PlayerController->SetViewTargetWithBlend(newTarget, blendTime, transiton, blenExp);
 
 		if(DestroidThis)
 		{
 			this->Destroy();
 		}
+		
+	}
+}
+
+void AGameCamera::MoveCameraInDir(FVector Dir, float speed, float moveTime )
+{
+	if(Dir!=FVector::ZeroVector && speed!=0 )
+	{
+		CameraTarget = (Dir.GetSafeNormal() * speed * moveTime) + GetActorLocation();
+		bMoving = true;
+	}
+}
+
+void AGameCamera::MoveCameraToActor(AActor* target, float speed)
+{
+	if (target!=nullptr && speed != 0)
+	{
+		CameraTarget = target->GetActorLocation();
+		bMoving = true;
+	}
+}
+
+
+void AGameCamera::MoveActorCamera(float deltaTime)
+{
+	//TODO cambiar formula ya que esta solo controla la distancia  no la velocidad 
+	FVector newPos = UKismetMathLibrary::VInterpTo(GetActorLocation(), CameraTarget, deltaTime, 0.6f);
+
+	if(FVector::Dist(CameraTarget, newPos)>10.0f)
+	{
+		SetActorLocation(newPos);
+	}
+	else
+	{
+		SetActorLocation(CameraTarget);
+		bMoving = false;
 	}
 }
 
 
 
+void AGameCamera::RotateCamera(FRotator targetRot, float speed, bool ConterClockwise)
+{
+	if(targetRot!=FRotator::ZeroRotator && speed!=0)
+	{
+		CameraRTarget = targetRot;
+		bRotating = true;
+	}
+}
+
+inline void AGameCamera::RotateActorCamera(float deltaTime)
+{
+	if(!GetActorRotation().Equals(CameraRTarget,1))
+	{
+		SetActorRotation(UKismetMathLibrary::RInterpTo(GetActorRotation(), CameraRTarget, deltaTime, 0.8));
+	}
+	else
+	{
+		SetActorRotation(CameraRTarget);
+		bRotating = false;
+	}
+}

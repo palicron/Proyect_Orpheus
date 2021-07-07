@@ -10,8 +10,8 @@ UCLASS()
 class PROYECT_ORPHEUS_API AGameCamera : public AActor
 {
 	GENERATED_BODY()
-	
-public:	
+
+public:
 	// Sets default values for this actor's properties
 	AGameCamera();
 
@@ -37,11 +37,36 @@ protected:
 	UPROPERTY(EditInstanceOnly, BlueprintReadWrite, Category = Camera, meta = (AllowPrivateAccess = "true"))
 		bool bStarCamera = false;
 
-public:	
+	UPROPERTY(EditInstanceOnly, BlueprintReadWrite, Category = Camera, meta = (AllowPrivateAccess = "true"))
+		bool bMoving = false;
+
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category = CameraMove, meta = (AllowPrivateAccess = "true"))
+		bool bRotating = false;
+
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = CameraMove, meta = (AllowPrivateAccess = "true"))
+		FVector CameraTarget;
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = CameraMove, meta = (AllowPrivateAccess = "true"))
+		FRotator CameraRTarget;
+	UFUNCTION()
+		void MoveActorCamera(float deltaTime);
+	UFUNCTION()
+		void RotateActorCamera(float deltaTime);
+
+public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	UFUNCTION(BlueprintCallable,Category="CameraUtiles")
-	void SetThisCamera(AActor* newTarget, float blendTime, EViewTargetBlendFunction transiton,float blenExp,bool DestroidThis=false);
+	UFUNCTION(BlueprintCallable, Category = "CameraUtiles")
+		void SetThisCamera(AActor* newTarget, float blendTime, EViewTargetBlendFunction transiton, float blenExp, bool DestroidThis = false);
 
+	UFUNCTION(BlueprintCallable, Category = "CameraUtiles")
+		 void MoveCameraInDir(FVector Dir, float speed,float moveTime=1.0f);
+	
+	UFUNCTION(BlueprintCallable, Category = "CameraUtiles")
+		 void MoveCameraToActor(AActor* target, float speed);
+
+	UFUNCTION(BlueprintCallable, Category = "CameraUtiles")
+		 void RotateCamera(FRotator targetRot, float speed,bool ConterClockwise=false);
 };
+
+
