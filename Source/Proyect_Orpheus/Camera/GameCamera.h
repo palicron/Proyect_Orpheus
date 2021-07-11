@@ -6,6 +6,32 @@
 #include "GameFramework/Actor.h"
 #include "GameCamera.generated.h"
 
+
+USTRUCT(BlueprintType)
+struct FCameraConfig
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera Congifuration")
+		FVector CenterPos = FVector::ZeroVector;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera Congifuration")
+		FRotator CenterRotation = FRotator::ZeroRotator;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera Congifuration")
+		FRotator CameraRelativeRotation = FRotator::ZeroRotator;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera Congifuration")
+		float CameraArmLenght = 3500.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera Congifuration")
+		float fileOfview = 45.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera Congifuration")
+		float CameraRation = 1.778646f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera Congifuration")
+		FVector CameraOFfset = FVector(-1000.0f, 950.f, 0.0f);
+};
+
 UCLASS()
 class PROYECT_ORPHEUS_API AGameCamera : public AActor
 {
@@ -60,13 +86,19 @@ public:
 		void SetThisCamera(AActor* newTarget, float blendTime, EViewTargetBlendFunction transiton, float blenExp, bool DestroidThis = false);
 
 	UFUNCTION(BlueprintCallable, Category = "CameraUtiles")
-		 void MoveCameraInDir(FVector Dir, float speed,float moveTime=1.0f);
-	
-	UFUNCTION(BlueprintCallable, Category = "CameraUtiles")
-		 void MoveCameraToActor(AActor* target, float speed);
+		void MoveCameraInDir(FVector Dir, float speed, float moveTime = 1.0f);
 
 	UFUNCTION(BlueprintCallable, Category = "CameraUtiles")
-		 void RotateCamera(FRotator targetRot, float speed,bool ConterClockwise=false);
+		void MoveCameraToActor(AActor* target, float speed);
+
+	UFUNCTION(BlueprintCallable, Category = "CameraUtiles")
+		void RotateCamera(FRotator targetRot, float speed, bool ConterClockwise = false);
+
+	UFUNCTION(BlueprintCallable, Category = "CameraUtiles")
+		void ResetCameraToStarPosition();
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Camera, meta = (AllowPrivateAccess = "true"))
+		FCameraConfig StartConfiguration;
 };
 
 
