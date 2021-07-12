@@ -155,7 +155,7 @@ void AGameCamera::ResetCameraToStarPosition()
 	TopDownCameraComponent->AspectRatio = StartConfiguration.CameraRation;
 
 	SetActorLocation(StartConfiguration.CenterPos);
-	SetActorRotation(FRotator::ZeroRotator);
+	SetActorRotation(StartConfiguration.CenterRotation);
 }
 
 inline void AGameCamera::RotateActorCamera(float deltaTime)
