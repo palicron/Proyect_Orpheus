@@ -4,6 +4,7 @@
 #include "UObject/ConstructorHelpers.h"
 #include "Components/DecalComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Engine/DecalActor.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PlayerController.h"
 #include "Materials/Material.h"
@@ -25,18 +26,14 @@ AProyect_OrpheusCharacter::AProyect_OrpheusCharacter()
 	GetCharacterMovement()->bConstrainToPlane = true;
 	GetCharacterMovement()->bSnapToPlaneAtStart = true;
 
-	
+
 
 	// Create a decal in the world to show the cursor's location
-	CursorToWorld = CreateDefaultSubobject<UDecalComponent>("CursorToWorld");
-	CursorToWorld->SetupAttachment(RootComponent);
-	static ConstructorHelpers::FObjectFinder<UMaterial> DecalMaterialAsset(TEXT("Material'/Game/TopDownCPP/Blueprints/M_Cursor_Decal.M_Cursor_Decal'"));
-	if (DecalMaterialAsset.Succeeded())
-	{
-		CursorToWorld->SetDecalMaterial(DecalMaterialAsset.Object);
-	}
-	CursorToWorld->DecalSize = FVector(16.0f, 32.0f, 32.0f);
-	CursorToWorld->SetRelativeRotation(FRotator(90.0f, 0.0f, 0.0f).Quaternion());
+	//CursorToWorld = CreateDefaultSubobject<UDecalComponent>("CursorToWorld");
+	//CursorToWorld->SetupAttachment(RootComponent);
+
+	//CursorToWorld->DecalSize = FVector(16.0f, 32.0f, 32.0f);
+	//CursorToWorld->SetRelativeRotation(FRotator(90.0f, 0.0f, 0.0f).Quaternion());
 
 	// Activate ticking in order to update the cursor every frame.
 	PrimaryActorTick.bCanEverTick = true;
@@ -45,19 +42,29 @@ AProyect_OrpheusCharacter::AProyect_OrpheusCharacter()
 
 void AProyect_OrpheusCharacter::Tick(float DeltaSeconds)
 {
-    Super::Tick(DeltaSeconds);
+	Super::Tick(DeltaSeconds);
 
-	
-	if (CursorToWorld != nullptr)
+
+
+}
+
+void AProyect_OrpheusCharacter::SetCursolDecale()
+{
+
+	//TODO Cambiar el decale por un actor normal y ocriente guardar referecia apra destruccion
+	if (APlayerController* PC = Cast<APlayerController>(GetController()))
 	{
-       if (APlayerController* PC = Cast<APlayerController>(GetController()))
+		FHitResult TraceHitResult;
+		PC->GetHitResultUnderCursor(ECC_Visibility, true, TraceHitResult);
+		FVector CursorFV = TraceHitResult.ImpactNormal;
+		FRotator CursorR = CursorFV.Rotation();
+		FActorSpawnParameters SpawnParams;
+		if (DefaultDecale)
 		{
-			FHitResult TraceHitResult;
-			PC->GetHitResultUnderCursor(ECC_Visibility, true, TraceHitResult);
-			FVector CursorFV = TraceHitResult.ImpactNormal;
-			FRotator CursorR = CursorFV.Rotation();
-			CursorToWorld->SetWorldLocation(TraceHitResult.Location);
-			CursorToWorld->SetWorldRotation(CursorR);
+			ADecalActor* SpawnetRef = GetWorld()->SpawnActor<ADecalActor>(DefaultDecale, TraceHitResult.ImpactPoint, FRotator::ZeroRotator, SpawnParams);
 		}
+
+
 	}
+
 }

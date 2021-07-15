@@ -36,35 +36,26 @@ void AProyect_OrpheusPlayerController::SetupInputComponent()
 	InputComponent->BindTouch(EInputEvent::IE_Pressed, this, &AProyect_OrpheusPlayerController::MoveToTouchLocation);
 	InputComponent->BindTouch(EInputEvent::IE_Repeat, this, &AProyect_OrpheusPlayerController::MoveToTouchLocation);
 
-	
+
 }
 
 
 
 void AProyect_OrpheusPlayerController::MoveToMouseCursor()
 {
-	if (UHeadMountedDisplayFunctionLibrary::IsHeadMountedDisplayEnabled())
-	{
-		if (AProyect_OrpheusCharacter* MyPawn = Cast<AProyect_OrpheusCharacter>(GetPawn()))
-		{
-			if (MyPawn->GetCursorToWorld())
-			{
-				UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, MyPawn->GetCursorToWorld()->GetComponentLocation());
-			}
-		}
-	}
-	else
-	{
-		// Trace to see what is under the mouse cursor
-		FHitResult Hit;
-		GetHitResultUnderCursor(ECC_Visibility, false, Hit);
 
-		if (Hit.bBlockingHit)
-		{
-			// We hit something, move there
-			SetNewMoveDestination(Hit.ImpactPoint);
-		}
+	// Trace to see what is under the mouse cursor
+	FHitResult Hit;
+	GetHitResultUnderCursor(ECC_Visibility, false, Hit);
+
+	if (Hit.bBlockingHit)
+	{
+		// We hit something, move there
+		SetNewMoveDestination(Hit.ImpactPoint);
+
+
 	}
+
 }
 
 void AProyect_OrpheusPlayerController::MoveToTouchLocation(const ETouchIndex::Type FingerIndex, const FVector Location)
@@ -99,6 +90,10 @@ void AProyect_OrpheusPlayerController::SetNewMoveDestination(const FVector DestL
 void AProyect_OrpheusPlayerController::OnSetDestinationPressed()
 {
 	// set flag to keep updating destination until released
+	if (AProyect_OrpheusCharacter* MyPawn = Cast<AProyect_OrpheusCharacter>(GetPawn()))
+	{
+		MyPawn->SetCursolDecale();
+	}
 	bMoveToMouseCursor = true;
 }
 
@@ -107,3 +102,5 @@ void AProyect_OrpheusPlayerController::OnSetDestinationReleased()
 	// clear flag to indicate we should stop updating the destination
 	bMoveToMouseCursor = false;
 }
+
+
