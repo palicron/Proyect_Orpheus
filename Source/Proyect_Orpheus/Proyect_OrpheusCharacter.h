@@ -6,7 +6,7 @@
 #include "GameFramework/Character.h"
 #include "Proyect_OrpheusCharacter.generated.h"
 
-class ADecalActor;
+class ANavigationDecales;
 UCLASS(Blueprintable)
 class AProyect_OrpheusCharacter : public ACharacter
 {
@@ -22,12 +22,16 @@ public:
 	FORCEINLINE class UDecalComponent* GetCursorToWorld() { return CursorToWorld; }
 
 	UFUNCTION(BlueprintCallable)
-		void SetCursolDecale();
+		void SetCursolDecale(bool correct);
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Decale)
-		TSubclassOf<ADecalActor> DefaultDecale;
+		TSubclassOf<ANavigationDecales> DefaultDecale;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Decale)
+		TSubclassOf<ANavigationDecales> noPathDecale;
 
 
+	ANavigationDecales* SpawnetTarget;
 
 private:
 

@@ -41,7 +41,7 @@ void ANavigationDecales::upDate()
 }
 void ANavigationDecales::destroid()
 {
-	Destroy();
+	
 }
 
 

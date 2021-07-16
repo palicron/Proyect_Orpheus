@@ -5,6 +5,7 @@
 #include "Runtime/Engine/Classes/Components/DecalComponent.h"
 #include "HeadMountedDisplayFunctionLibrary.h"
 #include "Proyect_OrpheusCharacter.h"
+#include "Actors/NavigationDecales.h"
 #include "Engine/World.h"
 
 AProyect_OrpheusPlayerController::AProyect_OrpheusPlayerController()
@@ -69,6 +70,7 @@ void AProyect_OrpheusPlayerController::MoveToTouchLocation(const ETouchIndex::Ty
 	{
 		// We hit something, move there
 		SetNewMoveDestination(HitResult.ImpactPoint);
+
 	}
 }
 
@@ -80,9 +82,16 @@ void AProyect_OrpheusPlayerController::SetNewMoveDestination(const FVector DestL
 		float const Distance = FVector::Dist(DestLocation, MyPawn->GetActorLocation());
 
 		// We need to issue move command only if far enough in order for walk animation to play correctly
-		if ((Distance > 120.0f))
+		if ((Distance > 100.0f))
 		{
 			UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, DestLocation);
+
+
+
+		}
+		else
+		{
+
 		}
 	}
 }
@@ -90,16 +99,33 @@ void AProyect_OrpheusPlayerController::SetNewMoveDestination(const FVector DestL
 void AProyect_OrpheusPlayerController::OnSetDestinationPressed()
 {
 	// set flag to keep updating destination until released
-	if (AProyect_OrpheusCharacter* MyPawn = Cast<AProyect_OrpheusCharacter>(GetPawn()))
-	{
-		MyPawn->SetCursolDecale();
-	}
+
+
 	bMoveToMouseCursor = true;
 }
 
 void AProyect_OrpheusPlayerController::OnSetDestinationReleased()
 {
 	// clear flag to indicate we should stop updating the destination
+
+	if (UAIBlueprintHelperLibrary::GetCurrentPath(this) == nullptr)
+	{
+		if (AProyect_OrpheusCharacter* pawn = Cast<AProyect_OrpheusCharacter>(GetPawn()))
+		{
+
+			pawn->SetCursolDecale(false);
+
+		}
+	}
+	else
+	{
+		if (AProyect_OrpheusCharacter* pawn = Cast<AProyect_OrpheusCharacter>(GetPawn()))
+		{
+
+			pawn->SetCursolDecale(true);
+
+		}
+	}
 	bMoveToMouseCursor = false;
 }
 

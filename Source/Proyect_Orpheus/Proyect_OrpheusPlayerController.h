@@ -39,6 +39,7 @@ protected:
 	void OnSetDestinationPressed();
 	void OnSetDestinationReleased();
 
+	bool SpawnDecale = false;
 
 };
 

@@ -37,6 +37,6 @@ void ANavigationDecaleTarget::upDate()
 
 void ANavigationDecaleTarget::destroid()
 {
-
+	Destroy();
 }
 

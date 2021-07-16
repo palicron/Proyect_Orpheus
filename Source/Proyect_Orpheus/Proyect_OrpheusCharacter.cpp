@@ -1,14 +1,13 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "Proyect_OrpheusCharacter.h"
-#include "UObject/ConstructorHelpers.h"
 #include "Components/DecalComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Engine/DecalActor.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PlayerController.h"
-#include "Materials/Material.h"
 #include "Engine/World.h"
+#include "Proyect_Orpheus/Private/Actors/NavigationDecales.h"
 
 AProyect_OrpheusCharacter::AProyect_OrpheusCharacter()
 {
@@ -48,7 +47,7 @@ void AProyect_OrpheusCharacter::Tick(float DeltaSeconds)
 
 }
 
-void AProyect_OrpheusCharacter::SetCursolDecale()
+void AProyect_OrpheusCharacter::SetCursolDecale(bool correct)
 {
 
 	//TODO Cambiar el decale por un actor normal y ocriente guardar referecia apra destruccion
@@ -56,15 +55,39 @@ void AProyect_OrpheusCharacter::SetCursolDecale()
 	{
 		FHitResult TraceHitResult;
 		PC->GetHitResultUnderCursor(ECC_Visibility, true, TraceHitResult);
-		FVector CursorFV = TraceHitResult.ImpactNormal;
+		FVector CursorFV = TraceHitResult.ImpactPoint;
+		CursorFV.Z += 2.0f;
 		FRotator CursorR = CursorFV.Rotation();
 		FActorSpawnParameters SpawnParams;
-		if (DefaultDecale)
+		if (DefaultDecale && noPathDecale)
 		{
-			ADecalActor* SpawnetRef = GetWorld()->SpawnActor<ADecalActor>(DefaultDecale, TraceHitResult.ImpactPoint, FRotator::ZeroRotator, SpawnParams);
+			if(SpawnetTarget==nullptr)
+			{
+				if(correct)
+				{
+					SpawnetTarget = GetWorld()->SpawnActor<ANavigationDecales>(DefaultDecale, CursorFV, FRotator::ZeroRotator, SpawnParams);
+				}
+				else
+				{
+					 GetWorld()->SpawnActor<ANavigationDecales>(noPathDecale, CursorFV, FRotator::ZeroRotator, SpawnParams);
+				}
+			}
+			else
+			{
+				if(correct)
+				{
+					SpawnetTarget->destroid();
+					SpawnetTarget = GetWorld()->SpawnActor<ANavigationDecales>(DefaultDecale, CursorFV, FRotator::ZeroRotator, SpawnParams);
+				}
+				else
+				{
+					GetWorld()->SpawnActor<ANavigationDecales>(noPathDecale, CursorFV, FRotator::ZeroRotator, SpawnParams);
+				}
+		
+			}
 		}
 
-
+		
 	}
 
 }
