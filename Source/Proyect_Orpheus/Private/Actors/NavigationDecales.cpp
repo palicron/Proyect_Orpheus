@@ -11,7 +11,7 @@ ANavigationDecales::ANavigationDecales()
 
 	meshMaterial = CreateDefaultSubobject<UStaticMeshComponent>(FName("PlaneMesh"));
 	meshMaterial->SetRelativeRotation(FRotator(0.0f, 00.0f, -90.0));
-	meshMaterial->SetupAttachment(RootComponent);
+	RootComponent = meshMaterial;
 
 }
 

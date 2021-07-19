@@ -7,7 +7,7 @@
 ANavigatorDecaleInvalid::ANavigatorDecaleInvalid()
 {
 	PrimaryActorTick.bCanEverTick = true;
-
+	RootComponent = meshMaterial;
 	SetActorRotation(FRotator(0.0f, 00.0f, -90.0));
 }
 

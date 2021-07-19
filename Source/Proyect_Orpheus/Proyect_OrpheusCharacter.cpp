@@ -69,7 +69,7 @@ void AProyect_OrpheusCharacter::SetCursolDecale(bool correct)
 				}
 				else
 				{
-					 GetWorld()->SpawnActor<ANavigationDecales>(noPathDecale, CursorFV, FRotator::ZeroRotator, SpawnParams);
+					 GetWorld()->SpawnActor<ANavigationDecales>(noPathDecale, CursorFV, FRotator(-90, 0, 0), SpawnParams);
 				}
 			}
 			else
@@ -81,7 +81,7 @@ void AProyect_OrpheusCharacter::SetCursolDecale(bool correct)
 				}
 				else
 				{
-					GetWorld()->SpawnActor<ANavigationDecales>(noPathDecale, CursorFV, FRotator::ZeroRotator, SpawnParams);
+					GetWorld()->SpawnActor<ANavigationDecales>(noPathDecale, CursorFV, FRotator(-90,0,0), SpawnParams);
 				}
 		
 			}
