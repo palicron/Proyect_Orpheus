@@ -25,7 +25,7 @@ void ANavigatorDecaleInvalid::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-void ANavigatorDecaleInvalid::start()
+void ANavigatorDecaleInvalid::start(AActor* actor)
 {
 }
 

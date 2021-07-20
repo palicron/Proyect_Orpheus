@@ -66,6 +66,7 @@ void AProyect_OrpheusCharacter::SetCursolDecale(bool correct)
 				if(correct)
 				{
 					SpawnetTarget = GetWorld()->SpawnActor<ANavigationDecales>(DefaultDecale, CursorFV, FRotator::ZeroRotator, SpawnParams);
+					SpawnetTarget->start(this);
 				}
 				else
 				{
@@ -78,6 +79,7 @@ void AProyect_OrpheusCharacter::SetCursolDecale(bool correct)
 				{
 					SpawnetTarget->destroid();
 					SpawnetTarget = GetWorld()->SpawnActor<ANavigationDecales>(DefaultDecale, CursorFV, FRotator::ZeroRotator, SpawnParams);
+					SpawnetTarget->start(this);
 				}
 				else
 				{

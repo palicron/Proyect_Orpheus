@@ -18,13 +18,16 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	AActor* owner;
+
+
 public:
 	ANavigationDecaleTarget();
 	
 	virtual void Tick(float DeltaTime) override;
 	
 
-		virtual void start() override;
+		virtual void start(AActor* actor) override;
 	
 		virtual void upDate() override;
 	

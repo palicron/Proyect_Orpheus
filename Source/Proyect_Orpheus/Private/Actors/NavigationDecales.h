@@ -30,7 +30,7 @@ public:
 		UStaticMeshComponent* meshMaterial;
 
 	UFUNCTION(BlueprintCallable, Category = "DecalesNavigations")
-		virtual void start();
+		virtual void start(AActor* actor);
 	UFUNCTION(BlueprintCallable, Category = "DecalesNavigations")
 		virtual void upDate() ;
 	UFUNCTION(BlueprintCallable, Category = "DecalesNavigations")

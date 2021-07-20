@@ -30,7 +30,7 @@ void ANavigationDecales::Tick(float DeltaTime)
 	
 }
 
-void ANavigationDecales::start()
+void ANavigationDecales::start(AActor* actor)
 {
 
 }

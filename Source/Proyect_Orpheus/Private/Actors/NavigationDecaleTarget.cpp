@@ -25,18 +25,25 @@ void ANavigationDecaleTarget::Tick(float DeltaTime)
 
 
 
-void ANavigationDecaleTarget::start()
+void ANavigationDecaleTarget::start(AActor* actor)
 {
-	
+	owner = actor;
 }
 
 void ANavigationDecaleTarget::upDate()
 {
-
+	if(owner)
+	{
+		if(FVector::Dist(owner->GetActorLocation(),GetActorLocation())<180)
+		{
+			destroid();
+		}
+	}
 }
 
 void ANavigationDecaleTarget::destroid()
 {
+	owner = nullptr;
 	Destroy();
 }
 

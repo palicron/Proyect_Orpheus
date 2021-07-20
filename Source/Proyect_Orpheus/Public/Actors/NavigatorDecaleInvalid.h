@@ -28,9 +28,11 @@ public:
 
 
 
-	virtual void start() override;
+	virtual void start(AActor* actor=nullptr) override;
 
 	virtual void upDate() override;
 
 	virtual void destroid() override;
+
+	
 };
