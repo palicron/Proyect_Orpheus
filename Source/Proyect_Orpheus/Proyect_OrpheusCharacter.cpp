@@ -24,9 +24,8 @@ AProyect_OrpheusCharacter::AProyect_OrpheusCharacter()
 	GetCharacterMovement()->RotationRate = FRotator(0.f, 640.f, 0.f);
 	GetCharacterMovement()->bConstrainToPlane = true;
 	GetCharacterMovement()->bSnapToPlaneAtStart = true;
-
-
-
+	GetCharacterMovement()->MaxWalkSpeed = baseSpeed;
+	
 	// Create a decal in the world to show the cursor's location
 	//CursorToWorld = CreateDefaultSubobject<UDecalComponent>("CursorToWorld");
 	//CursorToWorld->SetupAttachment(RootComponent);
@@ -42,8 +41,6 @@ AProyect_OrpheusCharacter::AProyect_OrpheusCharacter()
 void AProyect_OrpheusCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
-
-
 
 }
 

@@ -26,11 +26,15 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Decale)
 		TSubclassOf<ANavigationDecales> DefaultDecale;
-	
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Decale)
 		TSubclassOf<ANavigationDecales> noPathDecale;
 
-
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Stats")
+		float baseSpeed = 500.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Stats")
+		int32 baseStrength = 5;
+	
 	ANavigationDecales* SpawnetTarget;
 
 private:

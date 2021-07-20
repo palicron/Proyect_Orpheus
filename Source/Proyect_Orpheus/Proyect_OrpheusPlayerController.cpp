@@ -50,7 +50,6 @@ void AProyect_OrpheusPlayerController::MoveToMouseCursor()
 		// We hit something, move there
 		SetNewMoveDestination(Hit.ImpactPoint);
 
-
 	}
 
 }
