@@ -34,6 +34,10 @@ public:
 		float baseSpeed = 500.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Stats")
 		int32 baseStrength = 5;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Stats")
+		int32 baseAgility = 5;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Stats")
+		int32 baseIntelligence = 5;
 	
 	ANavigationDecales* SpawnetTarget;
 
