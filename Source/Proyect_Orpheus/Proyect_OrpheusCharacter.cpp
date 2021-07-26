@@ -1,13 +1,13 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "Proyect_OrpheusCharacter.h"
-#include "UObject/ConstructorHelpers.h"
 #include "Components/DecalComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Engine/DecalActor.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PlayerController.h"
-#include "Materials/Material.h"
 #include "Engine/World.h"
+#include "Proyect_Orpheus/Private/Actors/NavigationDecales.h"
 
 AProyect_OrpheusCharacter::AProyect_OrpheusCharacter()
 {
@@ -24,19 +24,14 @@ AProyect_OrpheusCharacter::AProyect_OrpheusCharacter()
 	GetCharacterMovement()->RotationRate = FRotator(0.f, 640.f, 0.f);
 	GetCharacterMovement()->bConstrainToPlane = true;
 	GetCharacterMovement()->bSnapToPlaneAtStart = true;
-
+	GetCharacterMovement()->MaxWalkSpeed = baseSpeed;
 	
-
 	// Create a decal in the world to show the cursor's location
-	CursorToWorld = CreateDefaultSubobject<UDecalComponent>("CursorToWorld");
-	CursorToWorld->SetupAttachment(RootComponent);
-	static ConstructorHelpers::FObjectFinder<UMaterial> DecalMaterialAsset(TEXT("Material'/Game/TopDownCPP/Blueprints/M_Cursor_Decal.M_Cursor_Decal'"));
-	if (DecalMaterialAsset.Succeeded())
-	{
-		CursorToWorld->SetDecalMaterial(DecalMaterialAsset.Object);
-	}
-	CursorToWorld->DecalSize = FVector(16.0f, 32.0f, 32.0f);
-	CursorToWorld->SetRelativeRotation(FRotator(90.0f, 0.0f, 0.0f).Quaternion());
+	//CursorToWorld = CreateDefaultSubobject<UDecalComponent>("CursorToWorld");
+	//CursorToWorld->SetupAttachment(RootComponent);
+
+	//CursorToWorld->DecalSize = FVector(16.0f, 32.0f, 32.0f);
+	//CursorToWorld->SetRelativeRotation(FRotator(90.0f, 0.0f, 0.0f).Quaternion());
 
 	// Activate ticking in order to update the cursor every frame.
 	PrimaryActorTick.bCanEverTick = true;
@@ -45,19 +40,60 @@ AProyect_OrpheusCharacter::AProyect_OrpheusCharacter()
 
 void AProyect_OrpheusCharacter::Tick(float DeltaSeconds)
 {
-    Super::Tick(DeltaSeconds);
+	Super::Tick(DeltaSeconds);
 
-	
-	if (CursorToWorld != nullptr)
+}
+
+void AProyect_OrpheusCharacter::SetCursolDecale(bool correct)
+{
+
+	//TODO Cambiar el decale por un actor normal y ocriente guardar referecia apra destruccion
+	if (APlayerController* PC = Cast<APlayerController>(GetController()))
 	{
-       if (APlayerController* PC = Cast<APlayerController>(GetController()))
+		FHitResult TraceHitResult;
+		PC->GetHitResultUnderCursor(ECC_Visibility, true, TraceHitResult);
+		FVector CursorFV = TraceHitResult.ImpactPoint;
+		CursorFV.Z += 2.0f;
+		FRotator CursorR = CursorFV.Rotation();
+		FActorSpawnParameters SpawnParams;
+		if (DefaultDecale && noPathDecale)
 		{
-			FHitResult TraceHitResult;
-			PC->GetHitResultUnderCursor(ECC_Visibility, true, TraceHitResult);
-			FVector CursorFV = TraceHitResult.ImpactNormal;
-			FRotator CursorR = CursorFV.Rotation();
-			CursorToWorld->SetWorldLocation(TraceHitResult.Location);
-			CursorToWorld->SetWorldRotation(CursorR);
+			if(SpawnetTarget==nullptr)
+			{
+				if(correct)
+				{
+					SpawnetTarget = GetWorld()->SpawnActor<ANavigationDecales>(DefaultDecale, CursorFV, FRotator::ZeroRotator, SpawnParams);
+					if (SpawnetTarget)
+					{
+						SpawnetTarget->start(this);
+					}
+				}
+				else
+				{
+					 GetWorld()->SpawnActor<ANavigationDecales>(noPathDecale, CursorFV, FRotator(-90, 0, 0), SpawnParams);
+				}
+			}
+			else
+			{
+				if(correct)
+				{
+					SpawnetTarget->destroid();
+					SpawnetTarget = GetWorld()->SpawnActor<ANavigationDecales>(DefaultDecale, CursorFV, FRotator::ZeroRotator, SpawnParams);
+					if(SpawnetTarget)
+					{
+						SpawnetTarget->start(this);
+					}
+					
+				}
+				else
+				{
+					GetWorld()->SpawnActor<ANavigationDecales>(noPathDecale, CursorFV, FRotator(-90,0,0), SpawnParams);
+				}
+		
+			}
 		}
+
+		
 	}
+
 }

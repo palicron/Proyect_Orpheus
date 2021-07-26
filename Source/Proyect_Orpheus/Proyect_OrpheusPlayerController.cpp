@@ -5,6 +5,8 @@
 #include "Runtime/Engine/Classes/Components/DecalComponent.h"
 #include "HeadMountedDisplayFunctionLibrary.h"
 #include "Proyect_OrpheusCharacter.h"
+#include "Actors/NavigationDecales.h"
+#include "NavigationSystem.h"
 #include "Engine/World.h"
 
 AProyect_OrpheusPlayerController::AProyect_OrpheusPlayerController()
@@ -17,11 +19,6 @@ void AProyect_OrpheusPlayerController::PlayerTick(float DeltaTime)
 {
 	Super::PlayerTick(DeltaTime);
 
-	// keep updating the destination every tick while desired
-	if (bMoveToMouseCursor)
-	{
-		MoveToMouseCursor();
-	}
 }
 
 void AProyect_OrpheusPlayerController::SetupInputComponent()
@@ -34,43 +31,33 @@ void AProyect_OrpheusPlayerController::SetupInputComponent()
 
 	// support touch devices 
 	InputComponent->BindTouch(EInputEvent::IE_Pressed, this, &AProyect_OrpheusPlayerController::MoveToTouchLocation);
-	InputComponent->BindTouch(EInputEvent::IE_Repeat, this, &AProyect_OrpheusPlayerController::MoveToTouchLocation);
+	//InputComponent->BindTouch(EInputEvent::IE_Repeat, this, &AProyect_OrpheusPlayerController::MoveToTouchLocation);
 
-	
+
 }
 
 
 
 void AProyect_OrpheusPlayerController::MoveToMouseCursor()
 {
-	if (UHeadMountedDisplayFunctionLibrary::IsHeadMountedDisplayEnabled())
-	{
-		if (AProyect_OrpheusCharacter* MyPawn = Cast<AProyect_OrpheusCharacter>(GetPawn()))
-		{
-			if (MyPawn->GetCursorToWorld())
-			{
-				UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, MyPawn->GetCursorToWorld()->GetComponentLocation());
-			}
-		}
-	}
-	else
-	{
-		// Trace to see what is under the mouse cursor
-		FHitResult Hit;
-		GetHitResultUnderCursor(ECC_Visibility, false, Hit);
 
-		if (Hit.bBlockingHit)
-		{
-			// We hit something, move there
-			SetNewMoveDestination(Hit.ImpactPoint);
-		}
+	// Trace to see what is under the mouse cursor
+	FHitResult Hit;
+	GetHitResultUnderCursor(ECC_Visibility, false, Hit);
+
+	if (Hit.bBlockingHit)
+	{
+		// We hit something, move there
+		SetNewMoveDestination(Hit.ImpactPoint);
+
 	}
+
 }
 
 void AProyect_OrpheusPlayerController::MoveToTouchLocation(const ETouchIndex::Type FingerIndex, const FVector Location)
 {
 	FVector2D ScreenSpaceLocation(Location);
-
+	ValidDestination = false;
 	// Trace to see what is under the touch location
 	FHitResult HitResult;
 	GetHitResultAtScreenPosition(ScreenSpaceLocation, CurrentClickTraceChannel, true, HitResult);
@@ -78,6 +65,25 @@ void AProyect_OrpheusPlayerController::MoveToTouchLocation(const ETouchIndex::Ty
 	{
 		// We hit something, move there
 		SetNewMoveDestination(HitResult.ImpactPoint);
+
+	}
+	if (UAIBlueprintHelperLibrary::GetCurrentPath(this) == nullptr || !ValidDestination)
+	{
+		if (AProyect_OrpheusCharacter* pawn = Cast<AProyect_OrpheusCharacter>(GetPawn()))
+		{
+
+			pawn->SetCursolDecale(false);
+
+		}
+	}
+	else
+	{
+		if (AProyect_OrpheusCharacter* pawn = Cast<AProyect_OrpheusCharacter>(GetPawn()))
+		{
+
+			pawn->SetCursolDecale(true);
+
+		}
 	}
 }
 
@@ -87,23 +93,54 @@ void AProyect_OrpheusPlayerController::SetNewMoveDestination(const FVector DestL
 	if (MyPawn)
 	{
 		float const Distance = FVector::Dist(DestLocation, MyPawn->GetActorLocation());
+		FVector newpos = FVector::ZeroVector;
+		ValidDestination = UNavigationSystemV1::K2_GetRandomLocationInNavigableRadius(GetWorld(), DestLocation, newpos, 0.0f);
 
+		
 		// We need to issue move command only if far enough in order for walk animation to play correctly
-		if ((Distance > 120.0f))
+		if ((Distance > 100.0f) && ValidDestination)
 		{
 			UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, DestLocation);
+
 		}
+
 	}
 }
 
 void AProyect_OrpheusPlayerController::OnSetDestinationPressed()
 {
 	// set flag to keep updating destination until released
-	bMoveToMouseCursor = true;
+	ValidDestination = false;
+	MoveToMouseCursor();
+
+
+	if (UAIBlueprintHelperLibrary::GetCurrentPath(this) == nullptr || !ValidDestination)
+	{
+		if (AProyect_OrpheusCharacter* pawn = Cast<AProyect_OrpheusCharacter>(GetPawn()))
+		{
+
+			pawn->SetCursolDecale(false);
+
+		}
+	}
+	else
+	{
+		if (AProyect_OrpheusCharacter* pawn = Cast<AProyect_OrpheusCharacter>(GetPawn()))
+		{
+
+			pawn->SetCursolDecale(true);
+
+		}
+	}
+
 }
 
 void AProyect_OrpheusPlayerController::OnSetDestinationReleased()
 {
 	// clear flag to indicate we should stop updating the destination
-	bMoveToMouseCursor = false;
+
+
+
 }
+
+
