@@ -23,6 +23,15 @@ protected:
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
+	UFUNCTION(BlueprintCallable)
+	virtual void OnPress();
+	UFUNCTION(BlueprintCallable)
+	virtual void OnLongPress();
+	UFUNCTION(BlueprintCallable)
+	virtual void OnSelectet();
+	UFUNCTION(BlueprintCallable)
+	virtual void OnDeSelectet();
+	UFUNCTION(BlueprintCallable)
+	virtual void ActorDectroid();
 		
 };

@@ -32,3 +32,28 @@ void UTIntractable::TickComponent(float DeltaTime, ELevelTick TickType, FActorCo
 	// ...
 }
 
+void UTIntractable::OnPress()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Press"));
+}
+
+void UTIntractable::OnLongPress()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Long press"));
+}
+
+void UTIntractable::OnSelectet()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Select"));
+}
+
+void UTIntractable::OnDeSelectet()
+{
+	UE_LOG(LogTemp, Warning, TEXT("DeSelect"));
+}
+
+void UTIntractable::ActorDectroid()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Destroid"));
+}
+
