@@ -36,7 +36,7 @@ protected:
 
 	/** Input handlers for SetDestination action. */
 	void OnSetDestinationPressed();
-	void OnSetDestinationReleased();
+	void OnSetDestinationReleased(const ETouchIndex::Type FingerIndex, const FVector Location);
 
 	bool SpawnDecale = false;
 

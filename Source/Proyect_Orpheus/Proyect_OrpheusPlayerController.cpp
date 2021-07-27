@@ -8,7 +8,7 @@
 #include "Actors/NavigationDecales.h"
 #include "NavigationSystem.h"
 #include "Engine/World.h"
-
+#include  "Public\Compoent\TIntractable.h"
 AProyect_OrpheusPlayerController::AProyect_OrpheusPlayerController()
 {
 	bShowMouseCursor = true;
@@ -27,13 +27,14 @@ void AProyect_OrpheusPlayerController::SetupInputComponent()
 	Super::SetupInputComponent();
 
 	InputComponent->BindAction("SetDestination", IE_Pressed, this, &AProyect_OrpheusPlayerController::OnSetDestinationPressed);
-	InputComponent->BindAction("SetDestination", IE_Released, this, &AProyect_OrpheusPlayerController::OnSetDestinationReleased);
+	//InputComponent->BindAction("SetDestination", IE_Released, this, &AProyect_OrpheusPlayerController::OnSetDestinationReleased);
 
 	// support touch devices 
 	InputComponent->BindTouch(EInputEvent::IE_Pressed, this, &AProyect_OrpheusPlayerController::MoveToTouchLocation);
-	//InputComponent->BindTouch(EInputEvent::IE_Repeat, this, &AProyect_OrpheusPlayerController::MoveToTouchLocation);
+	InputComponent->BindTouch(EInputEvent::IE_Released, this, &AProyect_OrpheusPlayerController::OnSetDestinationReleased);
 
-
+	
+	
 }
 
 
@@ -44,13 +45,20 @@ void AProyect_OrpheusPlayerController::MoveToMouseCursor()
 	// Trace to see what is under the mouse cursor
 	FHitResult Hit;
 	GetHitResultUnderCursor(ECC_Visibility, false, Hit);
-
-	if (Hit.bBlockingHit)
+	if(Hit.bBlockingHit)
 	{
-		// We hit something, move there
-		SetNewMoveDestination(Hit.ImpactPoint);
-
+		UTIntractable* cop = Cast<UTIntractable>(Hit.GetActor()->GetComponentByClass(UTIntractable::StaticClass()));
+		if (cop)
+		{
+			cop->OnPress();
+		}
+		else
+		{
+			SetNewMoveDestination(Hit.ImpactPoint);
+		}
 	}
+
+
 
 }
 
@@ -135,12 +143,14 @@ void AProyect_OrpheusPlayerController::OnSetDestinationPressed()
 
 }
 
-void AProyect_OrpheusPlayerController::OnSetDestinationReleased()
+void AProyect_OrpheusPlayerController::OnSetDestinationReleased(const ETouchIndex::Type FingerIndex, const FVector Location)
 {
-	// clear flag to indicate we should stop updating the destination
+
+	UE_LOG(LogTemp, Warning, TEXT("Relesee"));
 
 
 
 }
+
 
 
