@@ -19,6 +19,20 @@ void AProyect_OrpheusPlayerController::PlayerTick(float DeltaTime)
 {
 	Super::PlayerTick(DeltaTime);
 
+  if(bClicked)
+  {
+		clickTimer += DeltaTime;
+	
+		if(clickTimer>=longClickTime)
+		{
+			if(!bLongClink)
+			{
+				LongPress();
+				bLongClink = true;
+			}
+		}
+	}
+
 }
 
 void AProyect_OrpheusPlayerController::SetupInputComponent()
@@ -26,12 +40,12 @@ void AProyect_OrpheusPlayerController::SetupInputComponent()
 	// set up gameplay key bindings
 	Super::SetupInputComponent();
 
-	InputComponent->BindAction("SetDestination", IE_Pressed, this, &AProyect_OrpheusPlayerController::OnSetDestinationPressed);
+	//InputComponent->BindAction("SetDestination", IE_Pressed, this, &AProyect_OrpheusPlayerController::OnSetDestinationPressed);
 	//InputComponent->BindAction("SetDestination", IE_Released, this, &AProyect_OrpheusPlayerController::OnSetDestinationReleased);
 
 	// support touch devices 
 	InputComponent->BindTouch(EInputEvent::IE_Pressed, this, &AProyect_OrpheusPlayerController::MoveToTouchLocation);
-	InputComponent->BindTouch(EInputEvent::IE_Released, this, &AProyect_OrpheusPlayerController::OnSetDestinationReleased);
+	InputComponent->BindTouch(EInputEvent::IE_Released, this, &AProyect_OrpheusPlayerController::OnRelaseTouch);
 
 	
 	
@@ -65,34 +79,51 @@ void AProyect_OrpheusPlayerController::MoveToMouseCursor()
 void AProyect_OrpheusPlayerController::MoveToTouchLocation(const ETouchIndex::Type FingerIndex, const FVector Location)
 {
 	FVector2D ScreenSpaceLocation(Location);
+	clickDestination = ScreenSpaceLocation;
 	ValidDestination = false;
 	// Trace to see what is under the touch location
-	FHitResult HitResult;
-	GetHitResultAtScreenPosition(ScreenSpaceLocation, CurrentClickTraceChannel, true, HitResult);
-	if (HitResult.bBlockingHit)
+	
+	GetHitResultAtScreenPosition(clickDestination, CurrentClickTraceChannel, true, clickHitResult);
+	if (clickHitResult.bBlockingHit)
 	{
-		// We hit something, move there
-		SetNewMoveDestination(HitResult.ImpactPoint);
 
-	}
-	if (UAIBlueprintHelperLibrary::GetCurrentPath(this) == nullptr || !ValidDestination)
-	{
-		if (AProyect_OrpheusCharacter* pawn = Cast<AProyect_OrpheusCharacter>(GetPawn()))
+		UTIntractable* inter = Cast<UTIntractable>(clickHitResult.GetActor()->GetComponentByClass(UTIntractable::StaticClass()));
+
+		SelectedInteractive(inter);
+		
+		if (selectedInteractive)
 		{
-
-			pawn->SetCursolDecale(false);
-
+			bClicked = true;
+			
 		}
-	}
-	else
-	{
-		if (AProyect_OrpheusCharacter* pawn = Cast<AProyect_OrpheusCharacter>(GetPawn()))
+		else
 		{
+			SetNewMoveDestination(clickHitResult.ImpactPoint);
 
-			pawn->SetCursolDecale(true);
+			if (UAIBlueprintHelperLibrary::GetCurrentPath(this) == nullptr || !ValidDestination)
+			{
+				if (AProyect_OrpheusCharacter* pawn = Cast<AProyect_OrpheusCharacter>(GetPawn()))
+				{
 
+					pawn->SetCursolDecale(false);
+
+				}
+			}
+			else
+			{
+				if (AProyect_OrpheusCharacter* pawn = Cast<AProyect_OrpheusCharacter>(GetPawn()))
+				{
+
+					pawn->SetCursolDecale(true);
+
+				}
+			}
 		}
+	
+	
+
 	}
+	
 }
 
 void AProyect_OrpheusPlayerController::SetNewMoveDestination(const FVector DestLocation)
@@ -143,13 +174,61 @@ void AProyect_OrpheusPlayerController::OnSetDestinationPressed()
 
 }
 
-void AProyect_OrpheusPlayerController::OnSetDestinationReleased(const ETouchIndex::Type FingerIndex, const FVector Location)
+void AProyect_OrpheusPlayerController::OnRelaseTouch(const ETouchIndex::Type FingerIndex, const FVector Location)
 {
 
-	UE_LOG(LogTemp, Warning, TEXT("Relesee"));
+	//UE_LOG(LogTemp, Warning, TEXT("Relesee"));
 
+	if(clickTimer<longClickTime && selectedInteractive)
+	{
+		selectedInteractive->OnPress();
+	}
 
+	
+	 bLongClink = false;
+	 bClicked = false;
+	 clickTimer = 0;
+	
 
+}
+
+void AProyect_OrpheusPlayerController::LongPress()
+{
+	if (selectedInteractive)
+	{
+		selectedInteractive->OnLongPress();
+	}
+}
+
+void AProyect_OrpheusPlayerController::SelectedInteractive(UTIntractable* inter)
+{
+	if(selectedInteractive)
+	{
+		if(inter)
+		{
+			
+			if(inter->GetOwner() != selectedInteractive->GetOwner())
+			{
+				selectedInteractive->OnDeSelectet();
+				selectedInteractive = inter;
+				selectedInteractive->OnDeSelectet();
+				
+			}
+		}
+		else
+		{
+			selectedInteractive->OnDeSelectet();
+			selectedInteractive = inter;
+		}
+	}
+	else
+	{
+		selectedInteractive = inter;
+		if(selectedInteractive)
+		{
+			selectedInteractive->OnSelectet();
+		}
+	}
 }
 
 
