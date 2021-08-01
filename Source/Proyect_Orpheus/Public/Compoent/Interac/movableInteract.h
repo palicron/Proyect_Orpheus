@@ -12,7 +12,7 @@ enum class EMovementType:uint8
 	SimpleDirLinear UMETA(DisplayName = "Simple move in direction linear"),
 	SimpleActorLinear UMETA(DisplayName = "Simple move to actor linear"),
 };
-UCLASS()
+UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class PROYECT_ORPHEUS_API UmovableInteract : public UTIntractable
 {
 	GENERATED_BODY()
@@ -33,6 +33,10 @@ public:
 	UPROPERTY(EditInstanceOnly, BlueprintReadWrite, Category = "Direction config")
 		float TravelDistance = 0.0f;
 	bool moving = false;
+
+	int index = 0;
+
+	
 
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	
@@ -55,6 +59,7 @@ protected:
 	//Mueve el actor 
 	void MoveTarger(float deltaTime);
 
+	bool activateInter = true;
 	
 
 };
