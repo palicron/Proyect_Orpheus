@@ -10,6 +10,7 @@ UTIntractable::UTIntractable()
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
 
+	
 	// ...
 }
 
@@ -55,5 +56,10 @@ void UTIntractable::OnDeSelectet()
 void UTIntractable::ActorDectroid()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Destroid"));
+}
+
+void UTIntractable::SetNavigationPoint(FVector point)
+{
+	NavigationPoint = point;
 }
 

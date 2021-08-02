@@ -34,19 +34,7 @@ void UmovableInteract::TickComponent(float DeltaTime, ELevelTick TickType,
 void UmovableInteract::OnPress()
 {
 	//TODO incir movimiento al target
-	if (!activateInter)
-		return;
-	//TODO activar target
-	if(!moving || TwoWays )
-	{
-		index++;
-		if(index>MovePat.Num()-1)
-		{
-			index = 0;
-		}
 
-		moving = true;
-	}
 }
 
 void UmovableInteract::OnLongPress()
@@ -55,10 +43,25 @@ void UmovableInteract::OnLongPress()
 
 void UmovableInteract::OnSelectet()
 {
+	if (!activateInter)
+		return;
+	//TODO activar target
+	if (!moving || TwoWays)
+	{
+		index++;
+		if (index > MovePat.Num() - 1)
+		{
+			index = 0;
+		}
+
+		moving = true;
+	}
+	InSelectEvent.Broadcast();
 }
 
 void UmovableInteract::OnDeSelectet()
 {
+	InDeSelectEvent.Broadcast();
 }
 
 void UmovableInteract::ActorDectroid()

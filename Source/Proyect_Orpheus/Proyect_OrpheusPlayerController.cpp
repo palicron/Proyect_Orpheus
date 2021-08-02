@@ -32,6 +32,18 @@ void AProyect_OrpheusPlayerController::PlayerTick(float DeltaTime)
 			}
 		}
 	}
+	if(MovingToActor)
+	{
+		
+		if(FVector::Dist(GetPawn()->GetActorLocation(), CurrenInteractuveGoal)<= StopingDistance+100.0f)
+		{
+			MovingToActor = false;
+			if(selectedInteractive)
+			{
+				selectedInteractive->OnSelectet();
+			}
+		}
+	}
 
 }
 
@@ -55,7 +67,7 @@ void AProyect_OrpheusPlayerController::SetupInputComponent()
 
 void AProyect_OrpheusPlayerController::MoveToMouseCursor()
 {
-
+	//TODO Actulizar con el mouse tambine cunado halla tiempo toda funcin en touch
 	// Trace to see what is under the mouse cursor
 	FHitResult Hit;
 	GetHitResultUnderCursor(ECC_Visibility, false, Hit);
@@ -90,7 +102,7 @@ void AProyect_OrpheusPlayerController::MoveToTouchLocation(const ETouchIndex::Ty
 		UTIntractable* inter = Cast<UTIntractable>(clickHitResult.GetActor()->GetComponentByClass(UTIntractable::StaticClass()));
 
 		SelectedInteractive(inter);
-		
+		//TODO poner el decal cuando se precuiona un interactive
 		if (selectedInteractive)
 		{
 			bClicked = true;
@@ -118,6 +130,8 @@ void AProyect_OrpheusPlayerController::MoveToTouchLocation(const ETouchIndex::Ty
 
 				}
 			}
+			CurrenInteractuveGoal = FVector::ZeroVector;
+			MovingToActor = false;
 		}
 	
 	
@@ -137,7 +151,7 @@ void AProyect_OrpheusPlayerController::SetNewMoveDestination(const FVector DestL
 
 		
 		// We need to issue move command only if far enough in order for walk animation to play correctly
-		if ((Distance > 100.0f) && ValidDestination)
+		if ((Distance > StopingDistance) && ValidDestination)
 		{
 			UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, DestLocation);
 
@@ -182,6 +196,18 @@ void AProyect_OrpheusPlayerController::OnRelaseTouch(const ETouchIndex::Type Fin
 	if(clickTimer<longClickTime && selectedInteractive)
 	{
 		selectedInteractive->OnPress();
+		if(selectedInteractive->NavigationPoint!=FVector::ZeroVector)
+		{
+			CurrenInteractuveGoal = selectedInteractive->NavigationPoint;
+		
+		}
+		else
+		{
+			CurrenInteractuveGoal = selectedInteractive->GetOwner()->GetActorLocation();
+		
+		}
+		UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, CurrenInteractuveGoal);
+		MovingToActor = true;
 	}
 
 	
@@ -202,6 +228,7 @@ void AProyect_OrpheusPlayerController::LongPress()
 
 void AProyect_OrpheusPlayerController::SelectedInteractive(UTIntractable* inter)
 {
+	//TODO Diferenciar si el pj tine que ir ahsta el elemnto ineteractivo para activarlo con ONSelect
 	if(selectedInteractive)
 	{
 		if(inter)
@@ -211,8 +238,12 @@ void AProyect_OrpheusPlayerController::SelectedInteractive(UTIntractable* inter)
 			{
 				selectedInteractive->OnDeSelectet();
 				selectedInteractive = inter;
-				selectedInteractive->OnDeSelectet();
+				//selectedInteractive->OnSelectet();
 				
+			}
+			else
+			{
+				//selectedInteractive->OnSelectet();
 			}
 		}
 		else
@@ -226,9 +257,13 @@ void AProyect_OrpheusPlayerController::SelectedInteractive(UTIntractable* inter)
 		selectedInteractive = inter;
 		if(selectedInteractive)
 		{
-			selectedInteractive->OnSelectet();
+			//selectedInteractive->OnSelectet();
 		}
 	}
+}
+
+void AProyect_OrpheusPlayerController::MoveToInteract(FVector target)
+{
 }
 
 

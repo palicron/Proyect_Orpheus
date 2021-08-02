@@ -48,11 +48,20 @@ protected:
 
 	 UTIntractable* selectedInteractive = nullptr;
 	FVector2D clickDestination;
+	FVector CurrenInteractuveGoal;
 	bool bLongClink = false;
 	bool bClicked = false;
+	bool MovingToActor = false;
+	bool UsingObject = false;
 	float longClickTime = 2.0f;
 	float clickTimer = 0.0f;
 	FHitResult clickHitResult;
+
+	UFUNCTION(BlueprintCallable, Category = "Interactive")
+		void MoveToInteract(FVector target);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Navigation")
+		float StopingDistance = 50.0f;
 };
 
 

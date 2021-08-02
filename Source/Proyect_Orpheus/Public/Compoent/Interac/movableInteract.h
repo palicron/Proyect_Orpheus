@@ -60,6 +60,8 @@ protected:
 	void MoveTarger(float deltaTime);
 
 	bool activateInter = true;
+
+	
 	
 
 };

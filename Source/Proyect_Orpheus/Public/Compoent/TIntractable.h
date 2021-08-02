@@ -6,8 +6,9 @@
 #include "Components/ActorComponent.h"
 #include "TIntractable.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FSelectedDelegateEvent);
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class PROYECT_ORPHEUS_API UTIntractable : public UActorComponent
 {
 	GENERATED_BODY()
@@ -15,6 +16,9 @@ class PROYECT_ORPHEUS_API UTIntractable : public UActorComponent
 public:	
 	// Sets default values for this component's properties
 	UTIntractable();
+	
+
+	
 
 protected:
 	// Called when the game starts
@@ -33,5 +37,15 @@ public:
 	virtual void OnDeSelectet();
 	UFUNCTION(BlueprintCallable)
 	virtual void ActorDectroid();
+	UFUNCTION(BlueprintCallable)
+	virtual void SetNavigationPoint(FVector point);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		FVector NavigationPoint = FVector::ZeroVector;
+
+	UPROPERTY(BlueprintAssignable)
+	FSelectedDelegateEvent InSelectEvent;
+	UPROPERTY(BlueprintAssignable)
+	FSelectedDelegateEvent InDeSelectEvent;
 		
 };
