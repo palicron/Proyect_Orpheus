@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
 #include "Proyect_OrpheusPlayerController.generated.h"
-
+class UTIntractable;
 UCLASS()
 class AProyect_OrpheusPlayerController : public APlayerController
 {
@@ -36,12 +36,32 @@ protected:
 
 	/** Input handlers for SetDestination action. */
 	void OnSetDestinationPressed();
-	void OnSetDestinationReleased();
+	void OnRelaseTouch(const ETouchIndex::Type FingerIndex, const FVector Location);
+
+	void LongPress();
+
+	void SelectedInteractive(UTIntractable* inter);
 
 	bool SpawnDecale = false;
 
 	bool ValidDestination = false;
 
+	 UTIntractable* selectedInteractive = nullptr;
+	FVector2D clickDestination;
+	FVector CurrenInteractuveGoal;
+	bool bLongClink = false;
+	bool bClicked = false;
+	bool MovingToActor = false;
+	bool UsingObject = false;
+	float longClickTime = 2.0f;
+	float clickTimer = 0.0f;
+	FHitResult clickHitResult;
+
+	UFUNCTION(BlueprintCallable, Category = "Interactive")
+		void MoveToInteract(FVector target);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Navigation")
+		float StopingDistance = 50.0f;
 };
 
 

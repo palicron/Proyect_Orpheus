@@ -8,7 +8,7 @@
 #include "Actors/NavigationDecales.h"
 #include "NavigationSystem.h"
 #include "Engine/World.h"
-
+#include  "Public\Compoent\TIntractable.h"
 AProyect_OrpheusPlayerController::AProyect_OrpheusPlayerController()
 {
 	bShowMouseCursor = true;
@@ -19,6 +19,32 @@ void AProyect_OrpheusPlayerController::PlayerTick(float DeltaTime)
 {
 	Super::PlayerTick(DeltaTime);
 
+  if(bClicked)
+  {
+		clickTimer += DeltaTime;
+	
+		if(clickTimer>=longClickTime)
+		{
+			if(!bLongClink)
+			{
+				LongPress();
+				bLongClink = true;
+			}
+		}
+	}
+	if(MovingToActor)
+	{
+		
+		if(FVector::Dist(GetPawn()->GetActorLocation(), CurrenInteractuveGoal)<= StopingDistance+100.0f)
+		{
+			MovingToActor = false;
+			if(selectedInteractive)
+			{
+				selectedInteractive->OnSelectet();
+			}
+		}
+	}
+
 }
 
 void AProyect_OrpheusPlayerController::SetupInputComponent()
@@ -26,65 +52,92 @@ void AProyect_OrpheusPlayerController::SetupInputComponent()
 	// set up gameplay key bindings
 	Super::SetupInputComponent();
 
-	InputComponent->BindAction("SetDestination", IE_Pressed, this, &AProyect_OrpheusPlayerController::OnSetDestinationPressed);
-	InputComponent->BindAction("SetDestination", IE_Released, this, &AProyect_OrpheusPlayerController::OnSetDestinationReleased);
+	//InputComponent->BindAction("SetDestination", IE_Pressed, this, &AProyect_OrpheusPlayerController::OnSetDestinationPressed);
+	//InputComponent->BindAction("SetDestination", IE_Released, this, &AProyect_OrpheusPlayerController::OnSetDestinationReleased);
 
 	// support touch devices 
 	InputComponent->BindTouch(EInputEvent::IE_Pressed, this, &AProyect_OrpheusPlayerController::MoveToTouchLocation);
-	//InputComponent->BindTouch(EInputEvent::IE_Repeat, this, &AProyect_OrpheusPlayerController::MoveToTouchLocation);
+	InputComponent->BindTouch(EInputEvent::IE_Released, this, &AProyect_OrpheusPlayerController::OnRelaseTouch);
 
-
+	
+	
 }
 
 
 
 void AProyect_OrpheusPlayerController::MoveToMouseCursor()
 {
-
+	//TODO Actulizar con el mouse tambine cunado halla tiempo toda funcin en touch
 	// Trace to see what is under the mouse cursor
 	FHitResult Hit;
 	GetHitResultUnderCursor(ECC_Visibility, false, Hit);
-
-	if (Hit.bBlockingHit)
+	if(Hit.bBlockingHit)
 	{
-		// We hit something, move there
-		SetNewMoveDestination(Hit.ImpactPoint);
-
+		UTIntractable* cop = Cast<UTIntractable>(Hit.GetActor()->GetComponentByClass(UTIntractable::StaticClass()));
+		if (cop)
+		{
+			cop->OnPress();
+		}
+		else
+		{
+			SetNewMoveDestination(Hit.ImpactPoint);
+		}
 	}
+
+
 
 }
 
 void AProyect_OrpheusPlayerController::MoveToTouchLocation(const ETouchIndex::Type FingerIndex, const FVector Location)
 {
 	FVector2D ScreenSpaceLocation(Location);
+	clickDestination = ScreenSpaceLocation;
 	ValidDestination = false;
 	// Trace to see what is under the touch location
-	FHitResult HitResult;
-	GetHitResultAtScreenPosition(ScreenSpaceLocation, CurrentClickTraceChannel, true, HitResult);
-	if (HitResult.bBlockingHit)
+	
+	GetHitResultAtScreenPosition(clickDestination, CurrentClickTraceChannel, true, clickHitResult);
+	if (clickHitResult.bBlockingHit)
 	{
-		// We hit something, move there
-		SetNewMoveDestination(HitResult.ImpactPoint);
 
-	}
-	if (UAIBlueprintHelperLibrary::GetCurrentPath(this) == nullptr || !ValidDestination)
-	{
-		if (AProyect_OrpheusCharacter* pawn = Cast<AProyect_OrpheusCharacter>(GetPawn()))
+		UTIntractable* inter = Cast<UTIntractable>(clickHitResult.GetActor()->GetComponentByClass(UTIntractable::StaticClass()));
+
+		SelectedInteractive(inter);
+		//TODO poner el decal cuando se precuiona un interactive
+		if (selectedInteractive)
 		{
-
-			pawn->SetCursolDecale(false);
-
+			bClicked = true;
+			
 		}
-	}
-	else
-	{
-		if (AProyect_OrpheusCharacter* pawn = Cast<AProyect_OrpheusCharacter>(GetPawn()))
+		else
 		{
+			SetNewMoveDestination(clickHitResult.ImpactPoint);
 
-			pawn->SetCursolDecale(true);
+			if (UAIBlueprintHelperLibrary::GetCurrentPath(this) == nullptr || !ValidDestination)
+			{
+				if (AProyect_OrpheusCharacter* pawn = Cast<AProyect_OrpheusCharacter>(GetPawn()))
+				{
 
+					pawn->SetCursolDecale(false);
+
+				}
+			}
+			else
+			{
+				if (AProyect_OrpheusCharacter* pawn = Cast<AProyect_OrpheusCharacter>(GetPawn()))
+				{
+
+					pawn->SetCursolDecale(true);
+
+				}
+			}
+			
+			MovingToActor = false;
 		}
+	
+	
+
 	}
+	
 }
 
 void AProyect_OrpheusPlayerController::SetNewMoveDestination(const FVector DestLocation)
@@ -98,7 +151,7 @@ void AProyect_OrpheusPlayerController::SetNewMoveDestination(const FVector DestL
 
 		
 		// We need to issue move command only if far enough in order for walk animation to play correctly
-		if ((Distance > 100.0f) && ValidDestination)
+		if ((Distance > StopingDistance) && ValidDestination)
 		{
 			UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, DestLocation);
 
@@ -135,12 +188,83 @@ void AProyect_OrpheusPlayerController::OnSetDestinationPressed()
 
 }
 
-void AProyect_OrpheusPlayerController::OnSetDestinationReleased()
+void AProyect_OrpheusPlayerController::OnRelaseTouch(const ETouchIndex::Type FingerIndex, const FVector Location)
 {
-	// clear flag to indicate we should stop updating the destination
 
+	//UE_LOG(LogTemp, Warning, TEXT("Relesee"));
 
+	if(clickTimer<longClickTime && selectedInteractive)
+	{
+		selectedInteractive->OnPress();
+		if(selectedInteractive->NavigationPoint!=FVector::ZeroVector)
+		{
+			CurrenInteractuveGoal = selectedInteractive->NavigationPoint;
+		
+		}
+		else
+		{
+			CurrenInteractuveGoal = selectedInteractive->GetOwner()->GetActorLocation();
+		
+		}
+		UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, CurrenInteractuveGoal);
+		MovingToActor = true;
+	}
+
+	
+	 bLongClink = false;
+	 bClicked = false;
+	 clickTimer = 0;
+	
 
 }
+
+void AProyect_OrpheusPlayerController::LongPress()
+{
+	if (selectedInteractive)
+	{
+		selectedInteractive->OnLongPress();
+	}
+}
+
+void AProyect_OrpheusPlayerController::SelectedInteractive(UTIntractable* inter)
+{
+	//TODO Diferenciar si el pj tine que ir ahsta el elemnto ineteractivo para activarlo con ONSelect
+	if(selectedInteractive)
+	{
+		if(inter)
+		{
+			
+			if(inter->GetOwner() != selectedInteractive->GetOwner())
+			{
+				selectedInteractive->OnDeSelectet();
+				selectedInteractive = inter;
+				//selectedInteractive->OnSelectet();
+				
+			}
+			else
+			{
+				//selectedInteractive->OnSelectet();
+			}
+		}
+		else
+		{
+			selectedInteractive->OnDeSelectet();
+			selectedInteractive = inter;
+		}
+	}
+	else
+	{
+		selectedInteractive = inter;
+		if(selectedInteractive)
+		{
+			//selectedInteractive->OnSelectet();
+		}
+	}
+}
+
+void AProyect_OrpheusPlayerController::MoveToInteract(FVector target)
+{
+}
+
 
 
