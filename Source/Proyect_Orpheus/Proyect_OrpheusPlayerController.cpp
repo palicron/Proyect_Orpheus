@@ -130,7 +130,7 @@ void AProyect_OrpheusPlayerController::MoveToTouchLocation(const ETouchIndex::Ty
 
 				}
 			}
-			CurrenInteractuveGoal = FVector::ZeroVector;
+			
 			MovingToActor = false;
 		}
 	
