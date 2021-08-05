@@ -36,15 +36,31 @@ void UFHealthSystem::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 
 int32 UFHealthSystem::TakeDmg(int32 dmg)
 {
-	return 0;
+	if(GetWorld()->GetTimeSeconds()-LastTimeDmg>= InvulnerabilityTime && bIsAlive)
+	{
+		CurrentHealth = FMath::Clamp(CurrentHealth - dmg, 0, MaxHealth);
+		TakeDmgEvent.Broadcast();
+		if(CurrentHealth<=0)
+		{
+			Death();
+		}
+	}
+	return CurrentHealth;
 }
 
 int32 UFHealthSystem::CureDmg(int32 cure)
 {
-	return 0;
+	if (GetWorld()->GetTimeSeconds() - LastTimeHeal >= InvulnerabilityTime)
+	{
+		CurrentHealth = FMath::Clamp(CurrentHealth + cure, 0, MaxHealth);
+		CureDmgEvent.Broadcast();
+	}
+	return CurrentHealth;
 }
 
 void UFHealthSystem::Death()
 {
+	bIsAlive = false;
+	DeathEvent.Broadcast();
 }
 
