@@ -17,7 +17,12 @@ class PROYECT_ORPHEUS_API AFPlayer_AI_Ctr : public AAIController
 
 public:
 	AProyect_OrpheusCharacter* possesActor;
+
+	UFUNCTION(BlueprintCallable, Category = "AI Navigation")
+		void SetMoveLocation(FVector destination);
 protected:
 	virtual void OnPossess(APawn* InPawn) override;
+
+	virtual void OnUnPossess() override;
 	
 };

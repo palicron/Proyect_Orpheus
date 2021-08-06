@@ -128,23 +128,17 @@ void AProyect_OrpheusPlayerController::MoveToTouchLocation(const ETouchIndex::Ty
 	GetHitResultAtScreenPosition(clickDestination, CurrentClickTraceChannel, true, clickHitResult);
 	if (clickHitResult.bBlockingHit)
 	{
-
-		
-
 		AProyect_OrpheusCharacter* pj = Cast<AProyect_OrpheusCharacter>(clickHitResult.GetActor());
-
 		if(pj)
 		{
-			if(pj == GetPawn())
+			if(pj == CurrentCharacter)
 			{
-				UE_LOG(LogTemp, Warning, TEXT("Character %s"), *clickHitResult.GetActor()->GetName());
+				UE_LOG(LogTemp, Warning, TEXT("Character %s"), *CurrentCharacter->GetName());
 			}
 			else
 			{
-				Cast<AProyect_OrpheusCharacter>(GetPawn())->OnDePosses();
-				UnPossess();
-			
-				Possess(pj);
+				//Cast<AProyect_OrpheusCharacter>(GetPawn())->OnDePosses();
+				//Possess(pj);
 				
 			}
 	
@@ -152,7 +146,6 @@ void AProyect_OrpheusPlayerController::MoveToTouchLocation(const ETouchIndex::Ty
 		else
 		{
 			UTIntractable* inter = Cast<UTIntractable>(clickHitResult.GetActor()->GetComponentByClass(UTIntractable::StaticClass()));
-
 			SelectedInteractive(inter);
 			//TODO poner el decal cuando se precuiona un interactive
 			if (selectedInteractive)
@@ -162,28 +155,38 @@ void AProyect_OrpheusPlayerController::MoveToTouchLocation(const ETouchIndex::Ty
 			}
 			else
 			{
-				SetNewMoveDestination(clickHitResult.ImpactPoint);
 
-				if (UAIBlueprintHelperLibrary::GetCurrentPath(this) == nullptr || !ValidDestination)
+				if(CurrentCtr)
 				{
-					if (AProyect_OrpheusCharacter* pawn = Cast<AProyect_OrpheusCharacter>(GetPawn()))
+				
+					SetNewMoveDestination(clickHitResult.ImpactPoint);
+					
+					
+					
+					if (UAIBlueprintHelperLibrary::GetCurrentPath(CurrentCtr) == nullptr || !ValidDestination)
 					{
 
-						pawn->SetCursolDecale(false);
+					
+						if (CurrentCharacter)
+						{
 
+							CurrentCharacter->SetCursolDecale(false);
+
+						}
 					}
-				}
-				else
-				{
-					if (AProyect_OrpheusCharacter* pawn = Cast<AProyect_OrpheusCharacter>(GetPawn()))
+					else
 					{
+						if (CurrentCharacter)
+						{
+							UE_LOG(LogTemp, Warning, TEXT("Entro para el decale"));
+							CurrentCharacter->SetCursolDecale(true);
 
-						pawn->SetCursolDecale(true);
-
+						}
 					}
-				}
 
-				MovingToActor = false;
+					MovingToActor = false;
+				}
+	
 			}
 		}
 		
@@ -194,10 +197,10 @@ void AProyect_OrpheusPlayerController::MoveToTouchLocation(const ETouchIndex::Ty
 
 void AProyect_OrpheusPlayerController::SetNewMoveDestination(const FVector DestLocation)
 {
-	APawn* const MyPawn = GetPawn();
-	if (MyPawn)
+	
+	if (CurrentCharacter && CurrentCtr)
 	{
-		float const Distance = FVector::Dist(DestLocation, MyPawn->GetActorLocation());
+		float const Distance = FVector::Dist(DestLocation, CurrentCharacter->GetActorLocation());
 		FVector newpos = FVector::ZeroVector;
 		ValidDestination = UNavigationSystemV1::K2_GetRandomLocationInNavigableRadius(GetWorld(), DestLocation, newpos, 0.0f);
 
@@ -205,7 +208,7 @@ void AProyect_OrpheusPlayerController::SetNewMoveDestination(const FVector DestL
 		// We need to issue move command only if far enough in order for walk animation to play correctly
 		if ((Distance > StopingDistance) && ValidDestination)
 		{
-			UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, DestLocation);
+			UAIBlueprintHelperLibrary::SimpleMoveToLocation(CurrentCtr, DestLocation);
 
 		}
 

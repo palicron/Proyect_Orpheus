@@ -4,6 +4,11 @@
 #include "FPlayer_AI_Ctr.h"
 #include "Proyect_Orpheus/Proyect_OrpheusCharacter.h"
 
+void AFPlayer_AI_Ctr::SetMoveLocation(FVector destination)
+{
+	MoveToLocation(destination);
+}
+
 void AFPlayer_AI_Ctr::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
@@ -12,4 +17,9 @@ void AFPlayer_AI_Ctr::OnPossess(APawn* InPawn)
 
 
 	
+}
+
+void AFPlayer_AI_Ctr::OnUnPossess()
+{
+	Super::OnUnPossess();
 }

@@ -8,7 +8,8 @@
 #include "GameFramework/PlayerController.h"
 #include "Engine/World.h"
 #include "Proyect_Orpheus/Private/Actors/NavigationDecales.h"
-
+#include "Public/FPlayer_AI_Ctr.h"
+#include "Kismet/GameplayStatics.h"
 AProyect_OrpheusCharacter::AProyect_OrpheusCharacter()
 {
 	// Set size for player capsule
@@ -46,9 +47,10 @@ void AProyect_OrpheusCharacter::Tick(float DeltaSeconds)
 
 void AProyect_OrpheusCharacter::SetCursolDecale(bool correct)
 {
-
+	//TODO Optimizar esto
+	APlayerController* PC =  UGameplayStatics::GetPlayerController(GetWorld(), 0);
 	//TODO Cambiar el decale por un actor normal y ocriente guardar referecia apra destruccion
-	if (APlayerController* PC = Cast<APlayerController>(GetController()))
+	if (PC)
 	{
 		FHitResult TraceHitResult;
 		PC->GetHitResultUnderCursor(ECC_Visibility, true, TraceHitResult);
