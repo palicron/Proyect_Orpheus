@@ -97,3 +97,15 @@ void AProyect_OrpheusCharacter::SetCursolDecale(bool correct)
 	}
 
 }
+
+void AProyect_OrpheusCharacter::OnPosses()
+{
+}
+
+void AProyect_OrpheusCharacter::OnDePosses()
+{
+	if(SpawnetTarget)
+	{
+		SpawnetTarget->destroid();
+	}
+}

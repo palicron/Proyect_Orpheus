@@ -8,11 +8,41 @@
 #include "Actors/NavigationDecales.h"
 #include "NavigationSystem.h"
 #include "Engine/World.h"
+#include "Kismet/GameplayStatics.h"
+#include "Public/FPlayer_AI_Ctr.h"
 #include  "Public\Compoent\TIntractable.h"
 AProyect_OrpheusPlayerController::AProyect_OrpheusPlayerController()
 {
 	bShowMouseCursor = true;
 	DefaultMouseCursor = EMouseCursor::Crosshairs;
+	bAutoManageActiveCameraTarget = false;
+
+	
+}
+
+
+inline void AProyect_OrpheusPlayerController::BeginPlay()
+{
+	Super::BeginPlay();
+	TArray<AActor*> AllCharacters;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AProyect_OrpheusCharacter::StaticClass(), AllCharacters);
+	if(AllCharacters.Num()>0)
+	{
+		CurrentCharacter = Cast<AProyect_OrpheusCharacter>(AllCharacters[0]);
+		if(CurrentCharacter)
+		{
+			CurrentCtr = Cast<AFPlayer_AI_Ctr>(CurrentCharacter->GetController());
+			if(CurrentCtr)
+			{
+				UE_LOG(LogTemp, Warning, TEXT("El nombre del actor es %s"), *CurrentCharacter->GetName());
+			}
+			else
+			{
+
+				UE_LOG(LogTemp, Warning, TEXT("No hay AI_CTR"));
+			}
+		}
+	}
 }
 
 void AProyect_OrpheusPlayerController::PlayerTick(float DeltaTime)
@@ -99,42 +129,64 @@ void AProyect_OrpheusPlayerController::MoveToTouchLocation(const ETouchIndex::Ty
 	if (clickHitResult.bBlockingHit)
 	{
 
-		UTIntractable* inter = Cast<UTIntractable>(clickHitResult.GetActor()->GetComponentByClass(UTIntractable::StaticClass()));
+		
 
-		SelectedInteractive(inter);
-		//TODO poner el decal cuando se precuiona un interactive
-		if (selectedInteractive)
-		{
-			bClicked = true;
-			
-		}
-		else
-		{
-			SetNewMoveDestination(clickHitResult.ImpactPoint);
+		AProyect_OrpheusCharacter* pj = Cast<AProyect_OrpheusCharacter>(clickHitResult.GetActor());
 
-			if (UAIBlueprintHelperLibrary::GetCurrentPath(this) == nullptr || !ValidDestination)
+		if(pj)
+		{
+			if(pj == GetPawn())
 			{
-				if (AProyect_OrpheusCharacter* pawn = Cast<AProyect_OrpheusCharacter>(GetPawn()))
-				{
-
-					pawn->SetCursolDecale(false);
-
-				}
+				UE_LOG(LogTemp, Warning, TEXT("Character %s"), *clickHitResult.GetActor()->GetName());
 			}
 			else
 			{
-				if (AProyect_OrpheusCharacter* pawn = Cast<AProyect_OrpheusCharacter>(GetPawn()))
-				{
-
-					pawn->SetCursolDecale(true);
-
-				}
-			}
+				Cast<AProyect_OrpheusCharacter>(GetPawn())->OnDePosses();
+				UnPossess();
 			
-			MovingToActor = false;
+				Possess(pj);
+				
+			}
+	
 		}
-	
-	
+		else
+		{
+			UTIntractable* inter = Cast<UTIntractable>(clickHitResult.GetActor()->GetComponentByClass(UTIntractable::StaticClass()));
+
+			SelectedInteractive(inter);
+			//TODO poner el decal cuando se precuiona un interactive
+			if (selectedInteractive)
+			{
+				bClicked = true;
+
+			}
+			else
+			{
+				SetNewMoveDestination(clickHitResult.ImpactPoint);
+
+				if (UAIBlueprintHelperLibrary::GetCurrentPath(this) == nullptr || !ValidDestination)
+				{
+					if (AProyect_OrpheusCharacter* pawn = Cast<AProyect_OrpheusCharacter>(GetPawn()))
+					{
+
+						pawn->SetCursolDecale(false);
+
+					}
+				}
+				else
+				{
+					if (AProyect_OrpheusCharacter* pawn = Cast<AProyect_OrpheusCharacter>(GetPawn()))
+					{
+
+						pawn->SetCursolDecale(true);
+
+					}
+				}
+
+				MovingToActor = false;
+			}
+		}
+		
 
 	}
 	

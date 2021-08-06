@@ -6,6 +6,7 @@
 #include "GameFramework/PlayerController.h"
 #include "Proyect_OrpheusPlayerController.generated.h"
 class UTIntractable;
+class AFPlayer_AI_Ctr;
 UCLASS()
 class AProyect_OrpheusPlayerController : public APlayerController
 {
@@ -14,11 +15,14 @@ class AProyect_OrpheusPlayerController : public APlayerController
 public:
 	AProyect_OrpheusPlayerController();
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Navigation")
+		AFPlayer_AI_Ctr* CurrentCtr ;
 
+	class AProyect_OrpheusCharacter* CurrentCharacter;
 
 protected:
 	
-
+	virtual void BeginPlay() override;
 	// Begin PlayerController interface
 	virtual void PlayerTick(float DeltaTime) override;
 	virtual void SetupInputComponent() override;
@@ -62,6 +66,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Navigation")
 		float StopingDistance = 50.0f;
+
+
 };
+
 
 

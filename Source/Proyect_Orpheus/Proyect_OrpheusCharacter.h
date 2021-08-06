@@ -41,6 +41,13 @@ public:
 	
 	ANavigationDecales* SpawnetTarget;
 
+
+	UFUNCTION(BlueprintCallable)
+	virtual	void OnPosses();
+
+	UFUNCTION(BlueprintCallable)
+	virtual	void OnDePosses();
+
 private:
 
 	/** A decal that projects to the cursor location. */
