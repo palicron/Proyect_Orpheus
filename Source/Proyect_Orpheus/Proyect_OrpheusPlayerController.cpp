@@ -65,7 +65,7 @@ void AProyect_OrpheusPlayerController::PlayerTick(float DeltaTime)
 	if(MovingToActor)
 	{
 		
-		if(FVector::Dist(GetPawn()->GetActorLocation(), CurrenInteractuveGoal)<= StopingDistance+100.0f)
+		if(FVector::Dist(CurrentCharacter->GetActorLocation(), CurrenInteractuveGoal)<= StopingDistance+100.0f)
 		{
 			MovingToActor = false;
 			if(selectedInteractive)
@@ -137,8 +137,18 @@ void AProyect_OrpheusPlayerController::MoveToTouchLocation(const ETouchIndex::Ty
 			}
 			else
 			{
-				//Cast<AProyect_OrpheusCharacter>(GetPawn())->OnDePosses();
-				//Possess(pj);
+				CurrentCharacter->OnDePosses();
+				CurrentCharacter = pj;
+				UE_LOG(LogTemp, Warning, TEXT("el contorler antes %s"), *CurrentCtr->GetName());
+				CurrentCtr = Cast<AFPlayer_AI_Ctr>(pj->GetController()) ;
+				if(CurrentCtr)
+				{
+					UE_LOG(LogTemp, Warning, TEXT("HayController"));
+					//CurrentCharacter->OnPosses();
+				}
+				UE_LOG(LogTemp, Warning, TEXT("el contorler Despues %s"), *CurrentCtr->GetName());
+				
+				UE_LOG(LogTemp, Warning, TEXT("Nuevo pj %s"), *CurrentCharacter->GetName());
 				
 			}
 	
@@ -261,7 +271,7 @@ void AProyect_OrpheusPlayerController::OnRelaseTouch(const ETouchIndex::Type Fin
 			CurrenInteractuveGoal = selectedInteractive->GetOwner()->GetActorLocation();
 		
 		}
-		UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, CurrenInteractuveGoal);
+		UAIBlueprintHelperLibrary::SimpleMoveToLocation(CurrentCtr, CurrenInteractuveGoal);
 		MovingToActor = true;
 	}
 
