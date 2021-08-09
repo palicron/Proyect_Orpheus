@@ -48,14 +48,14 @@ protected:
 
 	bool SpawnDecale = false;
 
-	bool ValidDestination = false;
+	
 
 	 UTIntractable* selectedInteractive = nullptr;
 	FVector2D clickDestination;
 	FVector CurrenInteractuveGoal;
 	bool bLongClink = false;
 	bool bClicked = false;
-	bool MovingToActor = false;
+	bool changeCharacter = false;
 	bool UsingObject = false;
 	float longClickTime = 2.0f;
 	float clickTimer = 0.0f;

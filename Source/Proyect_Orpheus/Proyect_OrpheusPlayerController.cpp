@@ -62,18 +62,6 @@ void AProyect_OrpheusPlayerController::PlayerTick(float DeltaTime)
 			}
 		}
 	}
-	if(MovingToActor)
-	{
-		
-		if(FVector::Dist(CurrentCharacter->GetActorLocation(), CurrenInteractuveGoal)<= StopingDistance+100.0f)
-		{
-			MovingToActor = false;
-			if(selectedInteractive)
-			{
-				selectedInteractive->OnSelectet();
-			}
-		}
-	}
 
 }
 
@@ -122,7 +110,7 @@ void AProyect_OrpheusPlayerController::MoveToTouchLocation(const ETouchIndex::Ty
 {
 	FVector2D ScreenSpaceLocation(Location);
 	clickDestination = ScreenSpaceLocation;
-	ValidDestination = false;
+	
 	// Trace to see what is under the touch location
 	
 	GetHitResultAtScreenPosition(clickDestination, CurrentClickTraceChannel, true, clickHitResult);
@@ -133,23 +121,22 @@ void AProyect_OrpheusPlayerController::MoveToTouchLocation(const ETouchIndex::Ty
 		{
 			if(pj == CurrentCharacter)
 			{
-				UE_LOG(LogTemp, Warning, TEXT("Character %s"), *CurrentCharacter->GetName());
+	
 			}
 			else
 			{
 				CurrentCharacter->OnDePosses();
 				CurrentCharacter = pj;
-				UE_LOG(LogTemp, Warning, TEXT("el contorler antes %s"), *CurrentCtr->GetName());
+		
 				CurrentCtr = Cast<AFPlayer_AI_Ctr>(pj->GetController()) ;
 				if(CurrentCtr)
 				{
 					UE_LOG(LogTemp, Warning, TEXT("HayController"));
+					
 					//CurrentCharacter->OnPosses();
 				}
-				UE_LOG(LogTemp, Warning, TEXT("el contorler Despues %s"), *CurrentCtr->GetName());
-				
-				UE_LOG(LogTemp, Warning, TEXT("Nuevo pj %s"), *CurrentCharacter->GetName());
-				
+		
+				changeCharacter = true;
 			}
 	
 		}
@@ -167,34 +154,9 @@ void AProyect_OrpheusPlayerController::MoveToTouchLocation(const ETouchIndex::Ty
 			{
 
 				if(CurrentCtr)
-				{
-				
+				{				
 					SetNewMoveDestination(clickHitResult.ImpactPoint);
 					
-					
-					
-					if (UAIBlueprintHelperLibrary::GetCurrentPath(CurrentCtr) == nullptr || !ValidDestination)
-					{
-
-					
-						if (CurrentCharacter)
-						{
-
-							CurrentCharacter->SetCursolDecale(false);
-
-						}
-					}
-					else
-					{
-						if (CurrentCharacter)
-						{
-							UE_LOG(LogTemp, Warning, TEXT("Entro para el decale"));
-							CurrentCharacter->SetCursolDecale(true);
-
-						}
-					}
-
-					MovingToActor = false;
 				}
 	
 			}
@@ -210,17 +172,8 @@ void AProyect_OrpheusPlayerController::SetNewMoveDestination(const FVector DestL
 	
 	if (CurrentCharacter && CurrentCtr)
 	{
-		float const Distance = FVector::Dist(DestLocation, CurrentCharacter->GetActorLocation());
-		FVector newpos = FVector::ZeroVector;
-		ValidDestination = UNavigationSystemV1::K2_GetRandomLocationInNavigableRadius(GetWorld(), DestLocation, newpos, 0.0f);
 
-		
-		// We need to issue move command only if far enough in order for walk animation to play correctly
-		if ((Distance > StopingDistance) && ValidDestination)
-		{
-			UAIBlueprintHelperLibrary::SimpleMoveToLocation(CurrentCtr, DestLocation);
-
-		}
+		CurrentCtr->SetMoveLocation(DestLocation);
 
 	}
 }
@@ -228,11 +181,11 @@ void AProyect_OrpheusPlayerController::SetNewMoveDestination(const FVector DestL
 void AProyect_OrpheusPlayerController::OnSetDestinationPressed()
 {
 	// set flag to keep updating destination until released
-	ValidDestination = false;
+
 	MoveToMouseCursor();
 
 
-	if (UAIBlueprintHelperLibrary::GetCurrentPath(this) == nullptr || !ValidDestination)
+	if (UAIBlueprintHelperLibrary::GetCurrentPath(this) == nullptr )
 	{
 		if (AProyect_OrpheusCharacter* pawn = Cast<AProyect_OrpheusCharacter>(GetPawn()))
 		{
@@ -258,26 +211,14 @@ void AProyect_OrpheusPlayerController::OnRelaseTouch(const ETouchIndex::Type Fin
 
 	//UE_LOG(LogTemp, Warning, TEXT("Relesee"));
 
-	if(clickTimer<longClickTime && selectedInteractive)
+	if(clickTimer<longClickTime && selectedInteractive && !changeCharacter)
 	{
-		selectedInteractive->OnPress();
-		if(selectedInteractive->NavigationPoint!=FVector::ZeroVector)
-		{
-			CurrenInteractuveGoal = selectedInteractive->NavigationPoint;
-		
-		}
-		else
-		{
-			CurrenInteractuveGoal = selectedInteractive->GetOwner()->GetActorLocation();
-		
-		}
-		UAIBlueprintHelperLibrary::SimpleMoveToLocation(CurrentCtr, CurrenInteractuveGoal);
-		MovingToActor = true;
+		CurrentCtr->setMoveToInteractive(selectedInteractive);
 	}
 
-	
 	 bLongClink = false;
 	 bClicked = false;
+	 changeCharacter = false;
 	 clickTimer = 0;
 	
 
@@ -285,6 +226,8 @@ void AProyect_OrpheusPlayerController::OnRelaseTouch(const ETouchIndex::Type Fin
 
 void AProyect_OrpheusPlayerController::LongPress()
 {
+
+	//TODO cambiar al AI controller
 	if (selectedInteractive)
 	{
 		selectedInteractive->OnLongPress();
