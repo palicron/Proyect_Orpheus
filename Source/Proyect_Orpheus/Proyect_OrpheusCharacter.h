@@ -31,7 +31,7 @@ public:
 		TSubclassOf<ANavigationDecales> noPathDecale;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Stats")
-		float baseSpeed = 500.f;
+		float baseSpeed = 350.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Stats")
 		int32 baseStrength = 5;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Stats")
