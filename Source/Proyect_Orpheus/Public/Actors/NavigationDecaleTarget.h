@@ -32,6 +32,8 @@ public:
 		virtual void upDate() override;
 	
 		virtual void destroid() override;
+
+
 	
 };
 

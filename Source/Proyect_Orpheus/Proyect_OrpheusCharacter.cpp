@@ -19,7 +19,7 @@ AProyect_OrpheusCharacter::AProyect_OrpheusCharacter()
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = false;
 	bUseControllerRotationRoll = false;
-
+	
 	// Configure character movement
 	GetCharacterMovement()->bOrientRotationToMovement = true; // Rotate character to moving direction
 	GetCharacterMovement()->RotationRate = FRotator(0.f, 640.f, 0.f);
@@ -28,11 +28,17 @@ AProyect_OrpheusCharacter::AProyect_OrpheusCharacter()
 	GetCharacterMovement()->MaxWalkSpeed = baseSpeed;
 	
 	// Create a decal in the world to show the cursor's location
-	//CursorToWorld = CreateDefaultSubobject<UDecalComponent>("CursorToWorld");
-	//CursorToWorld->SetupAttachment(RootComponent);
+	DecaleCHild = CreateDefaultSubobject<UChildActorComponent>(TEXT("Selected Decale"));
+	DecaleCHild->SetupAttachment(RootComponent);
+	if(SelectDecale)
+	{
+		DecaleCHild->SetChildActorClass(SelectDecale);
 
-	//CursorToWorld->DecalSize = FVector(16.0f, 32.0f, 32.0f);
-	//CursorToWorld->SetRelativeRotation(FRotator(90.0f, 0.0f, 0.0f).Quaternion());
+	}
+	DecaleCHild->SetRelativeRotation(FRotator(-90.f, 0.0f, 0.0f));
+	DecaleCHild->SetRelativeLocation(FVector(0.0,0.0,-88.f));
+	DecaleCHild->SetRelativeScale3D(FVector(1.f));
+	DecaleCHild->SetVisibility(false);
 
 	// Activate ticking in order to update the cursor every frame.
 	PrimaryActorTick.bCanEverTick = true;
@@ -100,14 +106,26 @@ void AProyect_OrpheusCharacter::SetCursolDecale(bool correct)
 
 }
 
-void AProyect_OrpheusCharacter::OnPosses()
+void AProyect_OrpheusCharacter::OnSelected()
 {
-}
+	Selected = true;
 
-void AProyect_OrpheusCharacter::OnDePosses()
-{
+	DecaleCHild->SetVisibility(true);
+	
 	if(SpawnetTarget)
 	{
-		SpawnetTarget->destroid();
+		
+		SpawnetTarget->ChangeMaterial();
+	}
+}
+
+void AProyect_OrpheusCharacter::OnDeselected()
+{
+	Selected = false;
+	DecaleCHild->SetVisibility(false);
+	if(SpawnetTarget)
+	{
+		
+		SpawnetTarget->ChangeMaterial();
 	}
 }

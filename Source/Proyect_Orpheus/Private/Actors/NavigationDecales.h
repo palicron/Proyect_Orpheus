@@ -36,6 +36,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "DecalesNavigations")
 		virtual void destroid();
 
+	UFUNCTION(BlueprintImplementableEvent)
+		void ChangeMaterial();
+
 };
 
 

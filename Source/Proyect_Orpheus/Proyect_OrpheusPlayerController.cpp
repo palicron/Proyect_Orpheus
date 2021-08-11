@@ -34,13 +34,10 @@ inline void AProyect_OrpheusPlayerController::BeginPlay()
 			CurrentCtr = Cast<AFPlayer_AI_Ctr>(CurrentCharacter->GetController());
 			if(CurrentCtr)
 			{
-				UE_LOG(LogTemp, Warning, TEXT("El nombre del actor es %s"), *CurrentCharacter->GetName());
+				
+				CurrentCharacter->OnSelected();
 			}
-			else
-			{
 
-				UE_LOG(LogTemp, Warning, TEXT("No hay AI_CTR"));
-			}
 		}
 	}
 }
@@ -125,15 +122,14 @@ void AProyect_OrpheusPlayerController::MoveToTouchLocation(const ETouchIndex::Ty
 			}
 			else
 			{
-				CurrentCharacter->OnDePosses();
+				CurrentCharacter->OnDeselected();
 				CurrentCharacter = pj;
 		
 				CurrentCtr = Cast<AFPlayer_AI_Ctr>(pj->GetController()) ;
 				if(CurrentCtr)
 				{
-					UE_LOG(LogTemp, Warning, TEXT("HayController"));
 					
-					//CurrentCharacter->OnPosses();
+					CurrentCharacter->OnSelected();
 				}
 		
 				changeCharacter = true;

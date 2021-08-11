@@ -19,7 +19,7 @@ public:
 	virtual void Tick(float DeltaSeconds) override;
 
 
-	FORCEINLINE class UDecalComponent* GetCursorToWorld() { return CursorToWorld; }
+
 
 	UFUNCTION(BlueprintCallable)
 		void SetCursolDecale(bool correct);
@@ -30,6 +30,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Decale)
 		TSubclassOf<ANavigationDecales> noPathDecale;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Decale)
+		TSubclassOf<ANavigationDecales> SelectDecale;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Stats")
 		float baseSpeed = 350.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Stats")
@@ -38,23 +41,28 @@ public:
 		int32 baseAgility = 5;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Stats")
 		int32 baseIntelligence = 5;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Stats")
+		bool Selected=false;
 	
 	ANavigationDecales* SpawnetTarget;
 
 
 	UFUNCTION(BlueprintCallable)
-	virtual	void OnPosses();
+	virtual	void OnSelected();
 
 	UFUNCTION(BlueprintCallable)
-	virtual	void OnDePosses();
-
+	virtual	void OnDeselected();
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Player Stats")
+		UChildActorComponent* DecaleCHild;
 private:
 
-	/** A decal that projects to the cursor location. */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-		class UDecalComponent* CursorToWorld;
-
 	FVector ActorMoVeLocation;
+	
+
+
+
+	
 
 
 };
